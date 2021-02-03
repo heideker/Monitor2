@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
         if (!readSetupFromCL(argc, argv)) return -1;
     }
     MFstats.debug = debugMode;
+    MFstats.DockerStat = DockerStat;
     //MFstats.setVar(MFstats.IMvar);
     std::thread refresh (thrSampling);
     std::thread tLog (thrLog);

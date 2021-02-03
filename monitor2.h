@@ -130,6 +130,7 @@ bool parseVar(string token, string value){
     } else
     if (token == "ProcessNames") {
         MFstats.ProcessNames = splitString(trim(value), ',');
+        DockerStat = true;
     } else
     if (token == "DockerNames") {
         MFstats.DockerNames = splitString(trim(value), ',');
