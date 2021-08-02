@@ -224,7 +224,7 @@ void MonData::Refresh(){
 
                 //Ethtool statistics
                 if (this->Ethtool) {
-                    stringOut = run("ethtool -S " + na.Name);
+                    stringOut = run("ethtool -S " + na.Name +" 2>null");
                     //if (this->debug) cout << "ethtool stats: " << stringOut << endl;
                     std::stringstream ss(stringOut);
                     std::string param;
