@@ -40,6 +40,12 @@ typedef struct {
     long TxFifo;
 } networkAdapter;
 
+typedef struct {
+    std::string NIC;
+    std::string parameter;
+    long value;
+} ethtoolData;
+
 #include "mondata.h"
 
 
@@ -54,6 +60,7 @@ u_int16_t ServerPort = 8888;
 u_int16_t SampplingTime = 1;
 u_int16_t LogIntervall = 1;
 bool DockerStat = false;
+bool Ethtool = false;
 std::vector <std::string> ProcessNames;
 std::vector <std::string> DockerNames;
 bool SincMode = false;
@@ -72,6 +79,7 @@ void dumpVar(){
     cout << "ServerPort:\t" << ServerPort << endl;
     cout << "SampplingTime:\t" << SampplingTime << endl;
     cout << "DockerStat:\t" << DockerStat << endl;
+    cout << "Ethtool:\t" << Ethtool << endl;
     cout << "ProcessNames:\t";
     for (auto i: ProcessNames)
         std::cout << i << ' ';
@@ -119,6 +127,11 @@ bool parseVar(string token, string value){
         if (value == "1")
             DockerStat = true;
     } else
+    if (token == "EthStat") {
+        Ethtool = false; 
+        if (value == "1")
+            Ethtool = true;
+    } else
     if (token == "CPUPathStat") {
         MFstats.CPUPathStat = value;
     } else
@@ -130,10 +143,10 @@ bool parseVar(string token, string value){
     } else
     if (token == "ProcessNames") {
         MFstats.ProcessNames = splitString(trim(value), ',');
-        DockerStat = true;
     } else
     if (token == "DockerNames") {
         MFstats.DockerNames = splitString(trim(value), ',');
+        DockerStat = true;
     } else
     if (token == "tag") {
         tag = value;
@@ -166,6 +179,7 @@ bool parseVar(string token, string value){
 */
 
         cout << "\n\t--LogMode=<JSON|TXT|SQL>\n\t--LogFileName=<string>\n\t--NodeName=<string>"
+            << "\n\t--Ethtool=<1|0>\t\tActivate ethtool stats"
             << "\n\t--ServerMode\t\tActivate server mode\n\t--ServerPort=<int>\t\tSocket TCP Port"
             << "\n\t--SampplingTime=<int>\t\tSamppling Stats Intervall (default each one second)"
             << "\n\t--LogIntervall=<int>\t\tLogging intervall (default each one second)"
@@ -173,13 +187,14 @@ bool parseVar(string token, string value){
             << "\n\t--ProcessNames=process1,process2,..\t\tMonitored processess"
             << "\n\t--DockerNames=< * or docker1,docker2,.. >\t\tMonitored Dockers"
             << "\n\t--tag=<string>\t\tIdentification of experiment"
-            << "\n\t--ExpTime=<int>\t\tSeconds of monitoring (default 0=infinite)\n\t--debugMode"
+            << "\n\t--ExpTime=<int>\t\tSeconds of monitoring (default 0=infinite)\n\t--debugMode=<1|0>"
             << "\n\t--sinc\t\tSincronous mode\n\t--help\t\tThis help" << endl;
         return false;
     } else
     {
         cout << "Invalid argument: Token=" << token << "  Value=" << value << endl;
         cout << "\n\t--LogMode=<JSON|TXT|SQL>\n\t--LogFileName=<string>\n\t--NodeName=<string>"
+            << "\n\t--Ethtool=<1|0>\t\tActivate ethtool stats"
             << "\n\t--ServerMode\t\tActivate server mode\n\t--ServerPort=<int>\t\tSocket TCP Port"
             << "\n\t--SampplingTime=<int>\t\tSamppling Stats Intervall (default each one second)"
             << "\n\t--LogIntervall=<int>\t\tLogging intervall (default each one second)"
@@ -187,7 +202,7 @@ bool parseVar(string token, string value){
             << "\n\t--ProcessNames=process1,process2,..\t\tMonitored processess"
             << "\n\t--DockerNames=< * or docker1,docker2,.. >\t\tMonitored Dockers"
             << "\n\t--tag=<string>\t\tIdentification of experiment"
-            << "\n\t--ExpTime=<int>\t\tSeconds of monitoring (default 0=infinite)\n\t--debugMode"
+            << "\n\t--ExpTime=<int>\t\tSeconds of monitoring (default 0=infinite)\n\t--debugMode=<1|0>"
             << "\n\t--sinc\t\tSincronous mode\n\t--help\t\tThis help" << endl;
         return false;
     }

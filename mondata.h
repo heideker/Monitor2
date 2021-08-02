@@ -29,6 +29,7 @@ class MonData{
         std::vector <std::string> ProcessNames;
         std::vector <std::string> DockerNames;
         bool DockerStat = false;
+        bool Ethtool = false;
         unsigned int Timestamp; //timestamp
         long MemorySize;
         long MemoryAvailable;
@@ -41,6 +42,7 @@ class MonData{
         std::vector<networkAdapter> NetOffset;
         std::vector<processData> Processes;
         std::vector<processData> Dockers;
+        std::vector<ethtoolData> EthData;
         std::string getJsonStorage();
         std::string getJsonNetworkStats();
         std::string getJsonNetworkAdapters();
@@ -95,7 +97,8 @@ void MonData::Refresh(){
         }
         File.close();
     }
-    //reading network stats
+
+    //socket statistics
     networkData nd;
     nd.TCPtxQueue = 0;
     nd.TCPrxQueue = 0;
@@ -170,8 +173,10 @@ void MonData::Refresh(){
         File.close();
     }
     this->netData = nd;
+
     //reading network adapters stats...
     this->NetAdapters.clear();
+    std::string stringOut;
     File.open (this->NetworkPathStat + "/dev");
     if (File.is_open()) {
         //header
@@ -179,45 +184,69 @@ void MonData::Refresh(){
         getline(File, line);
         networkAdapter na;
         bool offset = false;
+        this->EthData.clear();
         if (this->NetOffset.size()>0) offset = true;
         while (! File.eof()){
             getline(File, line);
-            replaceAll(line, ":", " ");
-            if (!offset) {
-                networkAdapter naos;
+            if (line !="") {
+                replaceAll(line, ":", " ");
+                if (!offset) {
+                    networkAdapter naos;
+                    std::stringstream ss(line);
+                    ss >> naos.Name >> naos.RxBytes >> naos.RxPackets >> naos.RxErrors;
+                    ss >> naos.RxDrop >> naos.RxFifo >> trash >> trash >> trash;
+                    ss >> naos.TxBytes >> naos.TxPackets >> naos.TxErrors;
+                    ss >> naos.TxDrop >> naos.TxFifo;
+                    this->NetOffset.push_back (naos);
+                }
                 std::stringstream ss(line);
-                ss >> naos.Name >> naos.RxBytes >> naos.RxPackets >> naos.RxErrors;
-                ss >> naos.RxDrop >> naos.RxFifo >> trash >> trash >> trash;
-                ss >> naos.TxBytes >> naos.TxPackets >> naos.TxErrors;
-                ss >> naos.TxDrop >> naos.TxFifo;
-                this->NetOffset.push_back (naos);
-            }
-            std::stringstream ss(line);
-            ss >> na.Name >> na.RxBytes >> na.RxPackets >> na.RxErrors;
-            ss >> na.RxDrop >> na.RxFifo >> trash >> trash >> trash;
-            ss >> na.TxBytes >> na.TxPackets >> na.TxErrors;
-            ss >> na.TxDrop >> na.TxFifo;
-            //appling offset
-            for (auto p: this->NetOffset) {
-                if (p.Name==na.Name) {
-                    na.RxBytes -= p.RxBytes;
-                    na.RxPackets -= p.RxPackets;
-                    na.RxErrors -= p.RxErrors;
-                    na.RxDrop -= p.RxDrop;
-                    na.RxFifo -= p.RxFifo;
-                    na.TxBytes -= p.TxBytes;
-                    na.TxPackets -= p.TxPackets;
-                    na.TxErrors -= p.TxErrors;
-                    na.TxDrop -= p.TxDrop;
-                    na.TxFifo -= p.TxFifo;
-                    break;
+                ss >> na.Name >> na.RxBytes >> na.RxPackets >> na.RxErrors;
+                ss >> na.RxDrop >> na.RxFifo >> trash >> trash >> trash;
+                ss >> na.TxBytes >> na.TxPackets >> na.TxErrors;
+                ss >> na.TxDrop >> na.TxFifo;
+                //appling offset
+                for (auto p: this->NetOffset) {
+                    if (p.Name==na.Name) {
+                        na.RxBytes -= p.RxBytes;
+                        na.RxPackets -= p.RxPackets;
+                        na.RxErrors -= p.RxErrors;
+                        na.RxDrop -= p.RxDrop;
+                        na.RxFifo -= p.RxFifo;
+                        na.TxBytes -= p.TxBytes;
+                        na.TxPackets -= p.TxPackets;
+                        na.TxErrors -= p.TxErrors;
+                        na.TxDrop -= p.TxDrop;
+                        na.TxFifo -= p.TxFifo;
+                        break;
+                    }
+                }
+                this->NetAdapters.push_back (na);
+
+                //Ethtool statistics
+                if (this->Ethtool) {
+                    stringOut = run("ethtool -S " + na.Name);
+                    //if (this->debug) cout << "ethtool stats: " << stringOut << endl;
+                    std::stringstream ss(stringOut);
+                    std::string param;
+                    std::string value;
+                    ethtoolData etd;
+                    while (ss >> param >> value){
+                        if (param != "NIC" && param != "no") {
+                            if (this->debug) cout << na.Name << "\t" << param << "\t" << value << endl;
+                            etd.NIC = na.Name;
+                            etd.parameter = param;
+                            etd.value = atol(value.c_str());
+                            this->EthData.push_back(etd);
+
+                        }
+                    }
                 }
             }
-            this->NetAdapters.push_back (na);
         }
         File.close();
     }
     this->netData = nd;
+
     //reading architeture info...
     File.open (this->CPUPathArch);
     if (File.is_open()) {
@@ -231,7 +260,6 @@ void MonData::Refresh(){
         File.close();
     }
     //reading processes stats...using ps shell command
-    std::string stringOut;
     processData ps;
     if (this->ProcessNames.size()>1 || (this->ProcessNames.size()==1 && this->ProcessNames[0]!="") ) {
         this->Processes.clear();

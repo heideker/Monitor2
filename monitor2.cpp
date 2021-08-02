@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
     }
     MFstats.debug = debugMode;
     MFstats.DockerStat = DockerStat;
+    MFstats.Ethtool = Ethtool;
     //MFstats.setVar(MFstats.IMvar);
     std::thread refresh (thrSampling);
     std::thread tLog (thrLog);
@@ -225,7 +226,7 @@ std::string getSQLstats(){
     ostringstream txt;
     SEM_WAIT
     txt << "insert into monitor (exp, nodetype, tStamp, cpu, MemTotal, Mem, TcpTxQueue, TcpRxQueue, "
-        << "UdpTxQueue, UdpRxQueue, TcpWindow, erro) values ";
+        << "UdpTxQueue, UdpRxQueue, TcpWindow, erro) values \n";
     txt << " ('" << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", " 
             << MFstats.cpuLevel << ", " << MFstats.MemorySize << ", " << 
             (MFstats.MemorySize - MFstats.MemoryAvailable) << ", " 
@@ -255,7 +256,7 @@ std::string getSQLstats(){
     if (MFstats.NetAdapters.size()>0) {
         bool c = false;
         txt << "insert into network (exp, nodetype, tStamp, Name, RxBytes, RxPackets, RxErrors, RxDrop, "
-                << "RxFifo, TxBytes, TxPackets, TxErrors, TxDrop, TxFifo) values " ;
+                << "RxFifo, TxBytes, TxPackets, TxErrors, TxDrop, TxFifo) values \n" ;
         for (auto p: MFstats.NetAdapters) {
             txt << (c ? ", ('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
                     << p.Name << "', " << p.RxBytes << ", " << p.RxPackets << ", " 
@@ -264,7 +265,17 @@ std::string getSQLstats(){
                     << p.TxDrop << ", " << p.TxFifo << ")";   
                     c = true;
         }
-        txt << ";";
+        txt << ";" << endl;
+    }
+    if (MFstats.EthData.size()>0) {
+        bool c = false;
+        txt << "insert into ethdata (exp, nodetype, tStamp, NIC, parName, parValue ) values \n" ;
+        for (auto p: MFstats.EthData) {
+            txt << (c ? ", ('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
+                    << p.NIC << "', '" << p.parameter << "', " << p.value << ")";   
+                    c = true;
+        }
+        txt << ";" << endl;
     }
     SEM_POST
     txt << std::flush;
