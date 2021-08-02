@@ -179,7 +179,7 @@ bool parseVar(string token, string value){
 */
 
         cout << "\n\t--LogMode=<JSON|TXT|SQL>\n\t--LogFileName=<string>\n\t--NodeName=<string>"
-            << "\n\t--Ethtool=<1|0>\t\tActivate ethtool stats"
+            << "\n\t--EthStat=<1|0>\t\tActivate ethtool stats"
             << "\n\t--ServerMode\t\tActivate server mode\n\t--ServerPort=<int>\t\tSocket TCP Port"
             << "\n\t--SampplingTime=<int>\t\tSamppling Stats Intervall (default each one second)"
             << "\n\t--LogIntervall=<int>\t\tLogging intervall (default each one second)"
@@ -194,7 +194,7 @@ bool parseVar(string token, string value){
     {
         cout << "Invalid argument: Token=" << token << "  Value=" << value << endl;
         cout << "\n\t--LogMode=<JSON|TXT|SQL>\n\t--LogFileName=<string>\n\t--NodeName=<string>"
-            << "\n\t--Ethtool=<1|0>\t\tActivate ethtool stats"
+            << "\n\t--EthStat=<1|0>\t\tActivate ethtool stats"
             << "\n\t--ServerMode\t\tActivate server mode\n\t--ServerPort=<int>\t\tSocket TCP Port"
             << "\n\t--SampplingTime=<int>\t\tSamppling Stats Intervall (default each one second)"
             << "\n\t--LogIntervall=<int>\t\tLogging intervall (default each one second)"
