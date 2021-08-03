@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     std::thread refresh (thrSampling);
     std::thread tLog (thrLog);
     std::thread tServer (thrTCPServer);
-
+    if (debugMode) dumpVar();
     if (ExpTime > 0) {
         sleep(ExpTime);
         stayRunning = false;

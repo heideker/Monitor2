@@ -86,7 +86,7 @@ void dumpVar(){
     cout << "SampplingTime:\t" << SampplingTime << endl;
     cout << "DockerStat:\t" << DockerStat << endl;
     cout << "Ethtool:\t" << Ethtool << endl;
-    cout << "Nstat:\t" << Nstat << endl;
+    cout << "Nstat:\t\t" << Nstat << endl;
     cout << "ProcessNames:\t";
     for (auto i: ProcessNames)
         std::cout << i << ' ';

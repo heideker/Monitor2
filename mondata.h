@@ -176,9 +176,31 @@ void MonData::Refresh(){
     }
     this->netData = nd;
 
+    std::string stringOut;
+
+    //Nstat statistics
+    this->nstData.clear();
+    if (this->Nstat) {
+        stringOut = run("nstat -z 2>null");
+        //if (this->debug) cout << "nstat stats: " << stringOut << endl;
+        std::stringstream ss(stringOut);
+        std::string param;
+        std::string value;
+        std::string avg;
+        nstatData ntd;
+        if (ss >> param) {
+            while (ss >> param >> value >> avg){
+                if (this->debug) cout << param << "\t" << value <<  "\t" << avg << endl;
+                ntd.parameter = param;
+                ntd.value = atol(value.c_str());
+                this->nstData.push_back(ntd);
+            }
+        }
+    }
+
+
     //reading network adapters stats...
     this->NetAdapters.clear();
-    std::string stringOut;
     File.open (this->NetworkPathStat + "/dev");
     if (File.is_open()) {
         //header
@@ -239,25 +261,6 @@ void MonData::Refresh(){
                             etd.parameter = param;
                             etd.value = atol(value.c_str());
                             this->EthData.push_back(etd);
-
-                        }
-                    }
-                }
-                //Nstat statistics
-                if (this->Nstat) {
-                    stringOut = run("nstat -z 2>null");
-                    if (this->debug) cout << "nstat stats: " << stringOut << endl;
-                    std::stringstream ss(stringOut);
-                    std::string param;
-                    std::string value;
-                    std::string avg;
-                    nstatData ntd;
-                    while (ss >> param >> value >> avg){
-                        if (param.c_str()[0] != '#') {
-                            if (this->debug) cout << param << "\t" << value << endl;
-                            ntd.parameter = param;
-                            ntd.value = atol(value.c_str());
-                            this->nstData.push_back(ntd);
 
                         }
                     }
