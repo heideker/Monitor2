@@ -227,13 +227,13 @@ std::string getSQLstats(){
     ostringstream txt;
     SEM_WAIT
     txt << "insert into monitor (exp, nodetype, tStamp, cpu, MemTotal, Mem, TcpTxQueue, TcpRxQueue, "
-        << "UdpTxQueue, UdpRxQueue, TcpWindow, erro) values \n";
+        << "UdpTxQueue, UdpRxQueue, TcpWindow, kind) values \n";
     txt << " ('" << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", " 
             << MFstats.cpuLevel << ", " << MFstats.MemorySize << ", " << 
             (MFstats.MemorySize - MFstats.MemoryAvailable) << ", " 
             << MFstats.netData.TCPtxQueue << ", " << MFstats.netData.TCPrxQueue << ", " 
             << MFstats.netData.UDPtxQueue << ", " << MFstats.netData.UDPrxQueue << ", "
-            << MFstats.netData.TCPMaxWindowSize << ", 'OK')";
+            << MFstats.netData.TCPMaxWindowSize << ", 'OS')";
     
     //log watched processes
     for (auto p: MFstats.Processes) {
