@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
     MFstats.debug = debugMode;
     MFstats.DockerStat = DockerStat;
     MFstats.Ethtool = Ethtool;
+    MFstats.Nstat = Nstat;
     //MFstats.setVar(MFstats.IMvar);
     std::thread refresh (thrSampling);
     std::thread tLog (thrLog);
@@ -273,6 +274,16 @@ std::string getSQLstats(){
         for (auto p: MFstats.EthData) {
             txt << (c ? ", ('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
                     << p.NIC << "', '" << p.parameter << "', " << p.value << ")";   
+                    c = true;
+        }
+        txt << ";" << endl;
+    }
+    if (MFstats.nstData.size()>0) {
+        bool c = false;
+        txt << "insert into nstatdata (exp, nodetype, tStamp, parName, parValue ) values \n" ;
+        for (auto p: MFstats.nstData) {
+            txt << (c ? ", ('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
+                    << p.parameter << "', " << p.value << ")";   
                     c = true;
         }
         txt << ";" << endl;

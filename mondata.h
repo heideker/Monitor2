@@ -30,6 +30,7 @@ class MonData{
         std::vector <std::string> DockerNames;
         bool DockerStat = false;
         bool Ethtool = false;
+        bool Nstat = false;
         unsigned int Timestamp; //timestamp
         long MemorySize;
         long MemoryAvailable;
@@ -43,6 +44,7 @@ class MonData{
         std::vector<processData> Processes;
         std::vector<processData> Dockers;
         std::vector<ethtoolData> EthData;
+        std::vector<nstatData> nstData;
         std::string getJsonStorage();
         std::string getJsonNetworkStats();
         std::string getJsonNetworkAdapters();
@@ -241,11 +243,30 @@ void MonData::Refresh(){
                         }
                     }
                 }
+                //Nstat statistics
+                if (this->Nstat) {
+                    stringOut = run("nstat -z 2>null");
+                    if (this->debug) cout << "nstat stats: " << stringOut << endl;
+                    std::stringstream ss(stringOut);
+                    std::string param;
+                    std::string value;
+                    std::string avg;
+                    nstatData ntd;
+                    while (ss >> param >> value >> avg){
+                        if (param.c_str()[0] != '#') {
+                            if (this->debug) cout << param << "\t" << value << endl;
+                            ntd.parameter = param;
+                            ntd.value = atol(value.c_str());
+                            this->nstData.push_back(ntd);
+
+                        }
+                    }
+                }
             }
         }
         File.close();
     }
-    this->netData = nd;
+    //this->netData = nd;
 
     //reading architeture info...
     File.open (this->CPUPathArch);

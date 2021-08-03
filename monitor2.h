@@ -46,6 +46,11 @@ typedef struct {
     long value;
 } ethtoolData;
 
+typedef struct {
+    std::string parameter;
+    long value;
+} nstatData;
+
 #include "mondata.h"
 
 
@@ -61,6 +66,7 @@ u_int16_t SampplingTime = 1;
 u_int16_t LogIntervall = 1;
 bool DockerStat = false;
 bool Ethtool = false;
+bool Nstat = false;
 std::vector <std::string> ProcessNames;
 std::vector <std::string> DockerNames;
 bool SincMode = false;
@@ -80,6 +86,7 @@ void dumpVar(){
     cout << "SampplingTime:\t" << SampplingTime << endl;
     cout << "DockerStat:\t" << DockerStat << endl;
     cout << "Ethtool:\t" << Ethtool << endl;
+    cout << "Nstat:\t" << Nstat << endl;
     cout << "ProcessNames:\t";
     for (auto i: ProcessNames)
         std::cout << i << ' ';
@@ -132,6 +139,11 @@ bool parseVar(string token, string value){
         if (value == "1")
             Ethtool = true;
     } else
+    if (token == "Nstat") {
+        Nstat = false; 
+        if (value == "1")
+            Nstat = true;
+    } else
     if (token == "CPUPathStat") {
         MFstats.CPUPathStat = value;
     } else
@@ -180,6 +192,7 @@ bool parseVar(string token, string value){
 
         cout << "\n\t--LogMode=<JSON|TXT|SQL>\n\t--LogFileName=<string>\n\t--NodeName=<string>"
             << "\n\t--EthStat=<1|0>\t\tActivate ethtool stats"
+            << "\n\t--Nstat=<1|0>\t\tActivate nstat stats"
             << "\n\t--ServerMode\t\tActivate server mode\n\t--ServerPort=<int>\t\tSocket TCP Port"
             << "\n\t--SampplingTime=<int>\t\tSamppling Stats Intervall (default each one second)"
             << "\n\t--LogIntervall=<int>\t\tLogging intervall (default each one second)"
@@ -195,6 +208,7 @@ bool parseVar(string token, string value){
         cout << "Invalid argument: Token=" << token << "  Value=" << value << endl;
         cout << "\n\t--LogMode=<JSON|TXT|SQL>\n\t--LogFileName=<string>\n\t--NodeName=<string>"
             << "\n\t--EthStat=<1|0>\t\tActivate ethtool stats"
+            << "\n\t--Nstat=<1|0>\t\tActivate nstat stats"
             << "\n\t--ServerMode\t\tActivate server mode\n\t--ServerPort=<int>\t\tSocket TCP Port"
             << "\n\t--SampplingTime=<int>\t\tSamppling Stats Intervall (default each one second)"
             << "\n\t--LogIntervall=<int>\t\tLogging intervall (default each one second)"
