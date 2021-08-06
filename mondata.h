@@ -248,12 +248,37 @@ void MonData::Refresh(){
 
                 //Ethtool statistics
                 if (this->Ethtool) {
-                    stringOut = run("ethtool -S " + na.Name +" 2>null");
-                    //if (this->debug) cout << "ethtool stats: " << stringOut << endl;
+                    stringOut = run("ethtool -d " + na.Name +" raw on 2>null");
                     std::stringstream ss(stringOut);
                     std::string param;
                     std::string value;
                     ethtoolData etd;
+                    NICdump nd;
+                    while (ss >> nd){
+                            etd.NIC = na.Name;
+                            etd.parameter = "rdlen";
+                            etd.value = nd.rdlen;
+                            this->EthData.push_back(etd);
+                            etd.parameter = "rdh";
+                            etd.value = nd.rdh;
+                            this->EthData.push_back(etd);
+                            etd.parameter = "rdt";
+                            etd.value = nd.rdt;
+                            this->EthData.push_back(etd);
+                            etd.parameter = "tdlen";
+                            etd.value = nd.tdlen;
+                            this->EthData.push_back(etd);
+                            etd.parameter = "tdh";
+                            etd.value = nd.tdh;
+                            this->EthData.push_back(etd);
+                            etd.parameter = "tdt";
+                            etd.value = nd.tdt;
+                            this->EthData.push_back(etd);
+                        }
+                    }
+                    /*
+                    stringOut = run("ethtool -S " + na.Name +" 2>null");
+                    //if (this->debug) cout << "ethtool stats: " << stringOut << endl;
                     while (ss >> param >> value){
                         if (param != "NIC" && param != "no") {
                             if (this->debug) cout << na.Name << "\t" << param << "\t" << value << endl;
@@ -264,6 +289,7 @@ void MonData::Refresh(){
 
                         }
                     }
+                    */
                 }
             }
         }

@@ -17,6 +17,23 @@ typedef struct {
     long DataMem;
     long VirtMem;
 } processData;
+typedef struct {
+    uint32_t ctrl;
+    uint32_t status;
+    uint32_t rctl;
+    uint32_t rdlen;
+    uint32_t rdh;
+    uint32_t rdt;
+    uint32_t rdtr;
+    uint32_t tctl;
+    uint32_t tdlen;
+    uint32_t tdh;
+    uint32_t tdt;
+    uint32_t tidv;
+    uint32_t phystatus;
+    uint32_t phycontrol;
+    uint8_t trash[72];
+} NICdump;
 
 typedef struct {
     long UDPtxQueue;
