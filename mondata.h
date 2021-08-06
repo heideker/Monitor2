@@ -249,12 +249,13 @@ void MonData::Refresh(){
                 //Ethtool statistics
                 if (this->Ethtool) {
                     stringOut = run("ethtool -d " + na.Name +" raw on 2>null");
-                    std::stringstream ss(stringOut);
+                    //std::stringstream ss(stringOut);
                     std::string param;
                     std::string value;
                     ethtoolData etd;
                     NICdump nd;
-                    while (ss >> nd){
+                    if (sizeof(stringOut)>0) {
+                            memcpy(&nd, &stringOut, sizeof(nd));
                             etd.NIC = na.Name;
                             etd.parameter = "rdlen";
                             etd.value = nd.rdlen;
@@ -274,7 +275,7 @@ void MonData::Refresh(){
                             etd.parameter = "tdt";
                             etd.value = nd.tdt;
                             this->EthData.push_back(etd);
-                        }
+                        
                     }
                     /*
                     stringOut = run("ethtool -S " + na.Name +" 2>null");
