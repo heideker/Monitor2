@@ -52,6 +52,17 @@ string run(string command) {
     return out.str();
 }
 
+unsigned int runBin(string command, char *buff, unsigned int maxSize) {
+    FILE *in;
+    unsigned i = 0;
+    if((in = popen(command.c_str(), "r"))){
+        i = fread(buff, 1, maxSize, in);
+        pclose(in);
+    }
+    return i;
+}
+
+
 void replaceAll(string& str, const string& from, const string& to) {
     if(from.empty())
         return;
@@ -81,3 +92,10 @@ std::string ReplaceForbidden(std::string s){
 }
 
 
+void memDump(char *buff, int Size){
+
+    for (int i=0; i<Size; i++){
+        printf("%04d: %2X \t", i, buff[i]);
+    }
+
+}

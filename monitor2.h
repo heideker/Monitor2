@@ -18,21 +18,21 @@ typedef struct {
     long VirtMem;
 } processData;
 typedef struct {
-    uint32_t ctrl;
-    uint32_t status;
-    uint32_t rctl;
-    uint32_t rdlen;
-    uint32_t rdh;
-    uint32_t rdt;
-    uint32_t rdtr;
-    uint32_t tctl;
-    uint32_t tdlen;
-    uint32_t tdh;
-    uint32_t tdt;
-    uint32_t tidv;
-    uint32_t phystatus;
-    uint32_t phycontrol;
-    uint8_t trash[72];
+    unsigned int ctrl;
+    unsigned int status;
+    unsigned int rctl;
+    unsigned int rdlen;
+    unsigned int rdh;
+    unsigned int rdt;
+    unsigned int rdtr;
+    unsigned int tctl;
+    unsigned int tdlen;
+    unsigned int tdh;
+    unsigned int tdt;
+    unsigned int tidv;
+    unsigned int phystatus;
+    unsigned int phycontrol;
+    char trash[16];
 } NICdump;
 
 typedef struct {
@@ -41,6 +41,8 @@ typedef struct {
     long TCPtxQueue;
     long TCPrxQueue;
     unsigned int TCPMaxWindowSize; //only TCP
+    unsigned int RxRing;
+    unsigned int TxRing;
 } networkData;
 
 typedef struct {
@@ -55,6 +57,8 @@ typedef struct {
     long TxErrors;
     long TxDrop;
     long TxFifo;
+    unsigned int rxring;
+    unsigned int txring;
 } networkAdapter;
 
 typedef struct {

@@ -105,6 +105,8 @@ void MonData::Refresh(){
     nd.TCPtxQueue = 0;
     nd.TCPrxQueue = 0;
     nd.TCPMaxWindowSize = 0;
+    nd.RxRing = 0;
+    nd.TxRing = 0;
     std::string trash;
     File.open (this->NetworkPathStat + "/tcp");
     if (File.is_open()) {
@@ -174,7 +176,6 @@ void MonData::Refresh(){
         }
         File.close();
     }
-    this->netData = nd;
 
     std::string stringOut;
 
@@ -244,40 +245,49 @@ void MonData::Refresh(){
                         break;
                     }
                 }
-                this->NetAdapters.push_back (na);
+                na.rxring = 0;
+                na.txring = 0;
 
                 //Ethtool statistics
                 if (this->Ethtool) {
-                    stringOut = run("ethtool -d " + na.Name +" raw on 2>null");
-                    //std::stringstream ss(stringOut);
+                    //register dump
+                    char buff[128];
+                    int i = runBin("ethtool -d " + na.Name +" raw on 2>null", buff, 128);
                     std::string param;
                     std::string value;
                     ethtoolData etd;
-                    NICdump nd;
-                    if (sizeof(stringOut)>0) {
-                            memcpy(&nd, &stringOut, sizeof(nd));
-                            etd.NIC = na.Name;
-                            etd.parameter = "rdlen";
-                            etd.value = nd.rdlen;
-                            this->EthData.push_back(etd);
-                            etd.parameter = "rdh";
-                            etd.value = nd.rdh;
-                            this->EthData.push_back(etd);
-                            etd.parameter = "rdt";
-                            etd.value = nd.rdt;
-                            this->EthData.push_back(etd);
-                            etd.parameter = "tdlen";
-                            etd.value = nd.tdlen;
-                            this->EthData.push_back(etd);
-                            etd.parameter = "tdh";
-                            etd.value = nd.tdh;
-                            this->EthData.push_back(etd);
-                            etd.parameter = "tdt";
-                            etd.value = nd.tdt;
-                            this->EthData.push_back(etd);
-                        
+                    NICdump ndd;
+                    if (i == 128) {
+                        memset(&ndd, '\0', sizeof(ndd));
+                        memcpy(&ndd, buff, sizeof(ndd));
+                        etd.NIC = na.Name;
+                        etd.parameter = "rdlen";
+                        etd.value = ndd.rdlen;
+                        this->EthData.push_back(etd);
+                        etd.parameter = "rdh";
+                        etd.value = ndd.rdh;
+                        this->EthData.push_back(etd);
+                        etd.parameter = "rdt";
+                        etd.value = ndd.rdt;
+                        this->EthData.push_back(etd);
+                        etd.parameter = "tdlen";
+                        etd.value = ndd.tdlen;
+                        this->EthData.push_back(etd);
+                        etd.parameter = "tdh";
+                        etd.value = ndd.tdh;
+                        this->EthData.push_back(etd);
+                        etd.parameter = "tdt";
+                        etd.value = ndd.tdt;
+                        this->EthData.push_back(etd);
+                        na.rxring = (ndd.rdh>=ndd.rdt? ndd.rdh-ndd.rdt : ndd.rdlen - (ndd.rdt - ndd.rdh));
+                        if (na.rxring==2) na.rxring=0;
+                        nd.RxRing += na.rxring;
+                        na.txring = (ndd.tdh>=ndd.tdt? ndd.tdh-ndd.tdt : ndd.tdlen - (ndd.tdt - ndd.tdh));
+                        nd.TxRing += na.txring;
                     }
+                    //statistics
                     /*
+                    //std::stringstream ss(stringOut);
                     stringOut = run("ethtool -S " + na.Name +" 2>null");
                     //if (this->debug) cout << "ethtool stats: " << stringOut << endl;
                     while (ss >> param >> value){
@@ -292,11 +302,12 @@ void MonData::Refresh(){
                     }
                     */
                 }
+                this->NetAdapters.push_back (na);
             }
         }
         File.close();
     }
-    //this->netData = nd;
+    this->netData = nd;
 
     //reading architeture info...
     File.open (this->CPUPathArch);

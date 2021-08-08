@@ -227,13 +227,14 @@ std::string getSQLstats(){
     ostringstream txt;
     SEM_WAIT
     txt << "insert into monitor (exp, nodetype, tStamp, cpu, MemTotal, Mem, TcpTxQueue, TcpRxQueue, "
-        << "UdpTxQueue, UdpRxQueue, TcpWindow, kind) values \n";
+        << "UdpTxQueue, UdpRxQueue, TcpWindow, TxRing, RxRing, kind) values \n";
     txt << " ('" << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", " 
             << MFstats.cpuLevel << ", " << MFstats.MemorySize << ", " << 
             (MFstats.MemorySize - MFstats.MemoryAvailable) << ", " 
             << MFstats.netData.TCPtxQueue << ", " << MFstats.netData.TCPrxQueue << ", " 
             << MFstats.netData.UDPtxQueue << ", " << MFstats.netData.UDPrxQueue << ", "
-            << MFstats.netData.TCPMaxWindowSize << ", 'OS')";
+            << MFstats.netData.TCPMaxWindowSize << ", " << MFstats.netData.TxRing << ", " 
+            << MFstats.netData.RxRing << ", 'OS')";
     
     //log watched processes
     for (auto p: MFstats.Processes) {
@@ -257,13 +258,13 @@ std::string getSQLstats(){
     if (MFstats.NetAdapters.size()>0) {
         bool c = false;
         txt << "insert into network (exp, nodetype, tStamp, Name, RxBytes, RxPackets, RxErrors, RxDrop, "
-                << "RxFifo, TxBytes, TxPackets, TxErrors, TxDrop, TxFifo) values \n" ;
+                << "RxFifo, RxRing, TxBytes, TxPackets, TxErrors, TxDrop, TxFifo, TxRing) values \n" ;
         for (auto p: MFstats.NetAdapters) {
-            txt << (c ? ", ('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
+            txt << (c ? ", \n('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
                     << p.Name << "', " << p.RxBytes << ", " << p.RxPackets << ", " 
-                    << p.RxErrors << ", " << p.RxDrop << ", " << p.RxFifo << ", " 
+                    << p.RxErrors << ", " << p.RxDrop << ", " << p.RxFifo << ", " << p.rxring << ", "
                     << p.TxBytes << ", " << p.TxPackets << ", " << p.TxErrors << ", " 
-                    << p.TxDrop << ", " << p.TxFifo << ")";   
+                    << p.TxDrop << ", " << p.TxFifo << ", " << p.txring << ")";   
                     c = true;
         }
         txt << ";" << endl;
@@ -272,7 +273,7 @@ std::string getSQLstats(){
         bool c = false;
         txt << "insert into ethdata (exp, nodetype, tStamp, NIC, parName, parValue ) values \n" ;
         for (auto p: MFstats.EthData) {
-            txt << (c ? ", ('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
+            txt << (c ? ", \n('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
                     << p.NIC << "', '" << p.parameter << "', " << p.value << ")";   
                     c = true;
         }
@@ -282,7 +283,7 @@ std::string getSQLstats(){
         bool c = false;
         txt << "insert into nstatdata (exp, nodetype, tStamp, parName, parValue ) values \n" ;
         for (auto p: MFstats.nstData) {
-            txt << (c ? ", ('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
+            txt << (c ? ", \n('" : "('") << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", '" 
                     << p.parameter << "', " << p.value << ")";   
                     c = true;
         }
