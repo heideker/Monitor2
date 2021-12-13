@@ -53,8 +53,8 @@ class MonData{
         std::string getTxtNetworkStats();
         std::string getTxtNetworkAdapters();
         std::string getTxtProcess();
-        u_int8_t delta = 0;
-        u_int8_t nqaSamp = 0;
+        unsigned int delta = 0;
+        unsigned int nqaSamp = 0;
         //unsigned char cnt5 = 0;
         bool nqa1 = false;
         bool nqa5 = false;
