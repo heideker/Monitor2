@@ -53,10 +53,18 @@ class MonData{
         std::string getTxtNetworkStats();
         std::string getTxtNetworkAdapters();
         std::string getTxtProcess();
+        unsigned char delta = 0;
+        unsigned char nqaSamp = 0;
+        //unsigned char cnt5 = 0;
+        bool nqa1 = false;
+        bool nqa5 = false;
         void Refresh();
 };
 
 void MonData::Refresh(){
+    delta++;
+    nqaSamp++;
+    bool flagNQA = false;
     //Refresh system data
     this->Timestamp = std::time(0);
     struct sysinfo memInfo;
@@ -105,6 +113,8 @@ void MonData::Refresh(){
     nd.TCPtxQueue = 0;
     nd.TCPrxQueue = 0;
     nd.TCPMaxWindowSize = 0;
+    nd.UDPtxQueue = 0;
+    nd.UDPrxQueue = 0;
     nd.RxRing = 0;
     nd.TxRing = 0;
     std::string trash;
@@ -176,6 +186,7 @@ void MonData::Refresh(){
         }
         File.close();
     }
+
 
     std::string stringOut;
 
@@ -285,22 +296,7 @@ void MonData::Refresh(){
                         na.txring = (ndd.tdh>=ndd.tdt? ndd.tdh-ndd.tdt : ndd.tdlen - (ndd.tdt - ndd.tdh));
                         nd.TxRing += na.txring;
                     }
-                    //statistics
-                    /*
-                    //std::stringstream ss(stringOut);
-                    stringOut = run("ethtool -S " + na.Name +" 2>null");
-                    //if (this->debug) cout << "ethtool stats: " << stringOut << endl;
-                    while (ss >> param >> value){
-                        if (param != "NIC" && param != "no") {
-                            if (this->debug) cout << na.Name << "\t" << param << "\t" << value << endl;
-                            etd.NIC = na.Name;
-                            etd.parameter = param;
-                            etd.value = atol(value.c_str());
-                            this->EthData.push_back(etd);
 
-                        }
-                    }
-                    */
                 }
                 this->NetAdapters.push_back (na);
             }
@@ -308,6 +304,9 @@ void MonData::Refresh(){
         File.close();
     }
     this->netData = nd;
+
+    if (nd.TCPrxQueue > 0 || nd.TCPtxQueue > 0 || nd.UDPrxQueue > 0 || nd.UDPtxQueue > 0 || nd.RxRing > 0 || nd.TxRing > 0 ) 
+        flagNQA = true;
 
     //reading architeture info...
     File.open (this->CPUPathArch);
@@ -368,6 +367,20 @@ void MonData::Refresh(){
             }
         }   
     }
+    if (flagNQA) {
+        nd.nqaCnt1++;
+        if (nqaSamp >= 5) {
+            nd.nqaCnt5++;
+        }
+    }
+    if (nqaSamp >= 5) nqaSamp = 0;
+    if (delta >= 30) {
+        this->nqa1 = (nd.nqaCnt1 == 30);
+        this->nqa5 = (nd.nqaCnt5 == 6);
+        nd.nqaCnt1 = 0;
+        nd.nqaCnt5 = 0;        
+    }
+
 }
 std::string MonData::getJsonStorage(){
     //Not implemented

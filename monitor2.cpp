@@ -227,14 +227,15 @@ std::string getSQLstats(){
     ostringstream txt;
     SEM_WAIT
     txt << "insert into monitor (exp, nodetype, tStamp, cpu, MemTotal, Mem, TcpTxQueue, TcpRxQueue, "
-        << "UdpTxQueue, UdpRxQueue, TcpWindow, TxRing, RxRing, kind) values \n";
+        << "UdpTxQueue, UdpRxQueue, TcpWindow, TxRing, RxRing, nqaCnt1, nqaCnt5, nqa1, nqa5, kind) values \n";
     txt << " ('" << tag << "', '" << NodeName << "', " << MFstats.Timestamp << ", " 
             << MFstats.cpuLevel << ", " << MFstats.MemorySize << ", " << 
             (MFstats.MemorySize - MFstats.MemoryAvailable) << ", " 
             << MFstats.netData.TCPtxQueue << ", " << MFstats.netData.TCPrxQueue << ", " 
             << MFstats.netData.UDPtxQueue << ", " << MFstats.netData.UDPrxQueue << ", "
             << MFstats.netData.TCPMaxWindowSize << ", " << MFstats.netData.TxRing << ", " 
-            << MFstats.netData.RxRing << ", 'OS')";
+            << MFstats.netData.RxRing << ", " << MFstats.netData.nqaCnt1 << ", " 
+            << MFstats.netData.nqaCnt5 <<", " << MFstats.nqa1 << ", " << MFstats.nqa5 << ", 'OS')";
     
     //log watched processes
     for (auto p: MFstats.Processes) {
