@@ -234,8 +234,8 @@ std::string getSQLstats(){
             << MFstats.netData.TCPtxQueue << ", " << MFstats.netData.TCPrxQueue << ", " 
             << MFstats.netData.UDPtxQueue << ", " << MFstats.netData.UDPrxQueue << ", "
             << MFstats.netData.TCPMaxWindowSize << ", " << MFstats.netData.TxRing << ", " 
-            << MFstats.netData.RxRing << ", " << MFstats.netData.nqaCnt1 << ", " 
-            << MFstats.netData.nqaCnt5 << ", " << MFstats.nqa1 << ", " << MFstats.nqa5 << ", 'OS')";
+            << MFstats.netData.RxRing << ", " << MFstats.nqaCnt1 << ", " 
+            << MFstats.nqaCnt5 << ", " << MFstats.nqa1 << ", " << MFstats.nqa5 << ", 'OS')";
     
     //log watched processes
     for (auto p: MFstats.Processes) {
