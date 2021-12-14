@@ -378,7 +378,7 @@ void MonData::Refresh(){
         }
     }
     if (this->nqaSamp >= 5) this->nqaSamp = 0;
-    if (dthis->elta >= 30) {
+    if (this->delta >= 30) {
         this->nqa1 = (this->nqaCnt1 == 30);
         this->nqa5 = (this->nqaCnt5 == 6);
         this->nqaCnt1 = 0;
