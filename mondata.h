@@ -64,8 +64,8 @@ class MonData{
 };
 
 void MonData::Refresh(){
-    delta++;
-    nqaSamp++;
+    this->delta++;
+    this->nqaSamp++;
     bool flagNQA = false;
     //Refresh system data
     this->Timestamp = std::time(0);
@@ -373,17 +373,17 @@ void MonData::Refresh(){
     }
     if (flagNQA) {
         this->nqaCnt1++;
-        if (nqaSamp >= 5) {
+        if (this->nqaSamp >= 5) {
             this->nqaCnt5++;
         }
     }
-    if (nqaSamp >= 5) nqaSamp = 0;
-    if (delta >= 30) {
+    if (this->nqaSamp >= 5) this->nqaSamp = 0;
+    if (dthis->elta >= 30) {
         this->nqa1 = (this->nqaCnt1 == 30);
         this->nqa5 = (this->nqaCnt5 == 6);
         this->nqaCnt1 = 0;
         this->nqaCnt5 = 0;
-        delta = 0;        
+        this->delta = 0;        
     }
 
 }
