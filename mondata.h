@@ -305,10 +305,12 @@ void MonData::Refresh(){
         }
         File.close();
     }
-    this->netData = nd;
 
     if (nd.TCPrxQueue > 0 || nd.TCPtxQueue > 0 || nd.UDPrxQueue > 0 || nd.UDPtxQueue > 0 || nd.RxRing > 0 || nd.TxRing > 0 ) 
         flagNQA = true;
+
+    this->netData = nd;
+
 
     //reading architeture info...
     File.open (this->CPUPathArch);
@@ -380,7 +382,8 @@ void MonData::Refresh(){
         this->nqa1 = (this->nqaCnt1 == 30);
         this->nqa5 = (this->nqaCnt5 == 6);
         this->nqaCnt1 = 0;
-        this->nqaCnt5 = 0;        
+        this->nqaCnt5 = 0;
+        delta = 0;        
     }
 
 }
