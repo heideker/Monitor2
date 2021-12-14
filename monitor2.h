@@ -43,8 +43,6 @@ typedef struct {
     unsigned int TCPMaxWindowSize; //only TCP
     unsigned int RxRing;
     unsigned int TxRing;
-    unsigned int nqaCnt1;
-    unsigned int nqaCnt5;
 } networkData;
 
 typedef struct {

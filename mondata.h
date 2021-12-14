@@ -56,6 +56,8 @@ class MonData{
         unsigned int delta = 0;
         unsigned int nqaSamp = 0;
         //unsigned char cnt5 = 0;
+        unsigned int nqaCnt1;
+        unsigned int nqaCnt5;
         bool nqa1 = false;
         bool nqa5 = false;
         void Refresh();
@@ -368,17 +370,17 @@ void MonData::Refresh(){
         }   
     }
     if (flagNQA) {
-        nd.nqaCnt1++;
+        this->nqaCnt1++;
         if (nqaSamp >= 5) {
-            nd.nqaCnt5++;
+            this->nqaCnt5++;
         }
     }
     if (nqaSamp >= 5) nqaSamp = 0;
     if (delta >= 30) {
-        this->nqa1 = (nd.nqaCnt1 == 30);
-        this->nqa5 = (nd.nqaCnt5 == 6);
-        nd.nqaCnt1 = 0;
-        nd.nqaCnt5 = 0;        
+        this->nqa1 = (this->nqaCnt1 == 30);
+        this->nqa5 = (this->nqaCnt5 == 6);
+        this->nqaCnt1 = 0;
+        this->nqaCnt5 = 0;        
     }
 
 }
