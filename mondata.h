@@ -292,10 +292,10 @@ void MonData::Refresh(){
                         etd.parameter = "tdt";
                         etd.value = ndd.tdt;
                         this->EthData.push_back(etd);
-                        na.rxring = (ndd.rdh>=ndd.rdt? ndd.rdh-ndd.rdt : ndd.rdlen - (ndd.rdt - ndd.rdh));
+                        na.rxring = (ndd.rdh>=ndd.rdt? ndd.rdh-ndd.rdt : 255 - (ndd.rdt - ndd.rdh));
                         if (na.rxring==2) na.rxring=0;
                         nd.RxRing += na.rxring;
-                        na.txring = (ndd.tdh>=ndd.tdt? ndd.tdh-ndd.tdt : ndd.tdlen - (ndd.tdt - ndd.tdh));
+                        na.txring = (ndd.tdh>=ndd.tdt? ndd.tdh-ndd.tdt : 255 - (ndd.tdt - ndd.tdh));
                         nd.TxRing += na.txring;
                     }
 
